@@ -1,0 +1,181 @@
+/* =====================================================================
+   ESTILOS.CSS — Biblioteca Municipal
+   Identidad visual: ficha de catálogo / sello de préstamo.
+   Un solo archivo compartido por las 5 páginas (biblioteca, crear-cuenta,
+   ingreso, recuperar, contacto) para no repetir el mismo <style> 5 veces.
+   ===================================================================== */
+
+/* ---- Paleta (variables CSS: se definen una vez, se usan en todo el sitio) ---- */
+:root {
+  --tinta-navy: #1f2a3c;      /* azul marino oscuro: títulos, lomo del libro, footer */
+  --tinta-navy-oscuro: #141c29; /* variante más oscura para hover */
+  --azul-rey: #3457d5;         /* azul rey: SOLO para la barra de arriba (navbar) */
+  --azul-rey-oscuro: #28419e;  /* variante más oscura para hover en la navbar */
+  --papel: #e9e1cb;            /* fondo tipo papel envejecido */
+  --papel-claro: #f6f2e6;      /* tarjetas, fondo de formularios */
+  --bronce: #b8860b;           /* acento dorado: botones, líneas, foco */
+  --bronce-oscuro: #8f6a08;    /* hover de botones */
+  --sello-rojo: #8b3a3a;       /* errores, estados "atrasado" */
+  --texto-tinta: #2b2620;      /* texto principal, más cálido que negro puro */
+  --texto-suave: #6b6355;      /* texto secundario / muted */
+  --borde-papel: #d8cca8;      /* bordes sutiles sobre el papel */
+}
+
+/* ---- Tipografía: Lora (serif, para títulos) + Work Sans (sans, para uso) ---- */
+@import url("https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap");
+
+body {
+  font-family: "Work Sans", Arial, sans-serif;
+  margin: 0;
+  background: var(--papel);
+  color: var(--texto-tinta);
+}
+
+h1, h2, h3, .site-title h1 {
+  font-family: "Lora", Georgia, serif;
+  color: var(--tinta-navy);
+}
+
+/* ---- Navbar: reemplaza el morado de Bootstrap por la tinta navy ---- */
+.navbar-biblioteca {
+  background-color: var(--azul-rey) !important;
+  border-bottom: 3px solid var(--bronce);
+}
+.navbar-biblioteca .navbar-brand,
+.navbar-biblioteca .nav-link {
+  color: #f6f2e6 !important;
+  font-family: "Work Sans", sans-serif;
+  letter-spacing: 0.02em;
+}
+.navbar-biblioteca .nav-link:hover {
+  color: var(--bronce) !important;
+}
+.navbar-biblioteca .nav-link.active {
+  color: var(--bronce) !important;
+  font-weight: 600;
+}
+
+/* Marca: una "ficha" cuadrada con las iniciales, en vez de un emoji */
+.marca-biblioteca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+.marca-biblioteca .ficha {
+  width: 30px;
+  height: 30px;
+  background: var(--bronce);
+  color: var(--tinta-navy);
+  font-family: "Lora", serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+}
+
+.site-title { text-align: center; margin-top: 2rem; }
+
+.menu-terms {
+  text-align: center;
+  color: var(--bronce);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+.menu-terms span { margin: 0 0.5rem; }
+
+/* ---- Tarjetas: look "ficha de catálogo" (borde izquierdo, esquinas casi rectas) ---- */
+.feature-card {
+  border: 1px solid var(--borde-papel);
+  border-left: 4px solid var(--bronce);
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(31, 42, 60, 0.08);
+  height: 100%;
+  background: var(--papel-claro);
+}
+.feature-card .card-body,
+.feature-card.p-4 { font-family: "Work Sans", sans-serif; }
+
+.feature-card .card-title {
+  font-family: "Lora", serif;
+  color: var(--tinta-navy);
+}
+
+footer {
+  background: var(--tinta-navy);
+  color: var(--papel);
+  padding: 1.25rem 0;
+  text-align: center;
+  margin-top: 3rem;
+  font-family: "Work Sans", sans-serif;
+  border-top: 3px solid var(--bronce);
+}
+
+.lista-datos { list-style: none; padding-left: 0; }
+.lista-datos li {
+  padding: 10px 12px;
+  border-bottom: 1px dashed var(--borde-papel);
+}
+.lista-datos li:last-child { border-bottom: none; }
+.lista-datos .vacio { color: var(--texto-suave); font-style: italic; }
+
+.img-fluid { transition: transform 0.3s; border-radius: 4px; }
+.img-fluid:hover { transform: scale(1.02); }
+
+/* ---- Botón principal: rectangular, bronce, tipo "sello" ---- */
+.btn-biblioteca {
+  background-color: var(--bronce);
+  color: var(--tinta-navy);
+  font-weight: 600;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 3px;
+  text-decoration: none;
+  display: inline-block;
+  letter-spacing: 0.03em;
+  transition: background-color 0.2s ease;
+}
+.btn-biblioteca:hover { background-color: var(--bronce-oscuro); color: var(--tinta-navy); }
+
+.btn-primario {
+  background-color: var(--bronce);
+  color: var(--tinta-navy);
+  font-weight: 600;
+  border: none;
+  border-radius: 3px;
+  letter-spacing: 0.03em;
+  transition: background-color 0.2s ease;
+}
+.btn-primario:hover { background-color: var(--bronce-oscuro); color: var(--tinta-navy); }
+
+.form-label { font-weight: 500; color: var(--tinta-navy); }
+
+/* Foco de los campos: bronce en vez del azul genérico de Bootstrap */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--bronce);
+  box-shadow: 0 0 0 0.2rem rgba(184, 134, 11, 0.25);
+}
+
+/* ---- Mensajes de error por campo ---- */
+.mensaje-error {
+  color: var(--sello-rojo);
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  display: none;
+}
+.is-invalid ~ .mensaje-error { display: block; }
+
+/* ---- Barra de sesión activa ---- */
+.barra-sesion {
+  background: var(--tinta-navy-oscuro);
+  color: var(--papel);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 6px 0;
+}
+.barra-sesion a { color: var(--bronce); text-decoration: underline; }
