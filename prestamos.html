@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Préstamos | Biblioteca Municipal</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="estilos.css" />
+  </head>
+  <body>
+
+    <div class="barra-sesion d-none" id="barraSesion"></div>
+
+    <nav class="navbar navbar-expand-lg navbar-biblioteca">
+      <div class="container">
+        <a class="navbar-brand fw-bold marca-biblioteca" href="biblioteca.html">
+          <span class="ficha">BM</span> Biblioteca Municipal
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarMain">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link" href="biblioteca.html">Inicio</a></li>
+            <li class="nav-item"><a class="nav-link" href="catalogo.html">Catálogo</a></li>
+            <li class="nav-item"><a class="nav-link" href="usuarios.html">Usuarios</a></li>
+            <li class="nav-item"><a class="nav-link active" href="prestamos.html">Préstamos</a></li>
+            <li class="nav-item"><a class="nav-link" href="reservas.html">Reservas</a></li>
+            <li class="nav-item"><a class="nav-link" href="contacto.html">Contacto</a></li>
+            <li class="nav-item" id="navIngreso"><a class="nav-link" href="ingreso.html">Iniciar sesión</a></li>
+            <li class="nav-item" id="navCrearCuenta"><a class="nav-link" href="crear-cuenta.html">Crear cuenta</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <header class="container site-title">
+      <div class="menu-terms">
+        <span>Catálogo</span> | <span>Usuarios</span> | <span>Préstamos</span> | <span>Reservas</span>
+      </div>
+    </header>
+
+    <main class="container py-4">
+      <section class="py-4">
+        <h2 class="text-center mb-4">Préstamos activos</h2>
+        <div class="card feature-card mb-3">
+          <div class="card-body">
+            <ul class="lista-datos" id="prestamos-lista"></ul>
+          </div>
+        </div>
+
+        <div class="card feature-card">
+          <div class="card-body">
+            <h5 class="card-title">Registrar nuevo préstamo</h5>
+            <div id="avisoPrestamo" class="alert alert-warning d-none"></div>
+            <form id="formPrestamo" class="row g-3" novalidate>
+              <div class="col-md-4">
+                <label for="prestamoUsuario" class="form-label">Usuario</label>
+                <select class="form-select" id="prestamoUsuario" required>
+                  <option value="" selected disabled>Selecciona un usuario</option>
+                </select>
+                <div class="mensaje-error"></div>
+              </div>
+              <div class="col-md-4">
+                <label for="prestamoLibro" class="form-label">Libro</label>
+                <select class="form-select" id="prestamoLibro" required>
+                  <option value="" selected disabled>Selecciona un libro</option>
+                </select>
+                <div class="mensaje-error"></div>
+              </div>
+              <div class="col-md-4">
+                <label for="prestamoFecha" class="form-label">Fecha de vencimiento</label>
+                <input type="date" class="form-control" id="prestamoFecha" required />
+                <div class="mensaje-error"></div>
+              </div>
+              <div id="mensajeErrorPrestamo" class="alert alert-danger d-none" role="alert"></div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-primario">Registrar préstamo</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container">
+        <p class="mb-0">Biblioteca Municipal &copy; 2026 · contacto@bibliotecamunicipal.cl</p>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="datos.js"></script>
+    <script>
+      sembrarDatosDemo();
+      pintarBarraSesion();
+
+      const usuarios = obtenerLista(CLAVE_USUARIOS) || [];
+      const libros = obtenerLista(CLAVE_LIBROS) || [];
+      let prestamos = obtenerLista(CLAVE_PRESTAMOS) || [];
+
+      function pintarSelects() {
+        const selectUsuario = document.getElementById('prestamoUsuario');
+        selectUsuario.innerHTML = '<option value="" selected disabled>Selecciona un usuario</option>';
+        usuarios.forEach((u, idx) => {
+          const opt = document.createElement('option');
+          opt.value = idx;
+          opt.textContent = u.nombreCompleto;
+          selectUsuario.appendChild(opt);
+        });
+
+        const selectLibro = document.getElementById('prestamoLibro');
+        selectLibro.innerHTML = '<option value="" selected disabled>Selecciona un libro</option>';
+        libros.forEach((l, idx) => {
+          const opt = document.createElement('option');
+          opt.value = idx;
+          opt.textContent = `${l.titulo} (${l.autor})`;
+          selectLibro.appendChild(opt);
+        });
+      }
+      pintarSelects();
+
+      function pintarPrestamos() {
+        const listaPrestamos = document.getElementById('prestamos-lista');
+        listaPrestamos.innerHTML = '';
+        if (prestamos.length === 0) {
+          listaPrestamos.innerHTML = '<li class="vacio">Aún no hay préstamos registrados.</li>';
+          return;
+        }
+        prestamos.forEach((p, idx) => {
+          const li = document.createElement('li');
+          li.textContent = `#${idx + 1} - ${p.usuario} pidió "${p.libro}" - Estado: ${p.estado} - Vence: ${p.fechaVencimiento}`;
+          listaPrestamos.appendChild(li);
+        });
+      }
+      pintarPrestamos();
+
+      document.getElementById('formPrestamo').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const aviso = document.getElementById('avisoPrestamo');
+        aviso.classList.add('d-none');
+
+        if (usuarios.length === 0 || libros.length === 0) {
+          aviso.textContent = 'Necesitas al menos un usuario registrado (Crear cuenta) y un libro en el catálogo antes de registrar un préstamo.';
+          aviso.classList.remove('d-none');
+          return;
+        }
+
+        const selectUsuario = document.getElementById('prestamoUsuario');
+        const selectLibro = document.getElementById('prestamoLibro');
+        const inputFecha = document.getElementById('prestamoFecha');
+        const errorDiv = document.getElementById('mensajeErrorPrestamo');
+        errorDiv.classList.add('d-none');
+
+        let valido = true;
+        if (selectUsuario.value === "") { mostrarError(selectUsuario, "Selecciona un usuario."); valido = false; } else limpiarError(selectUsuario);
+        if (selectLibro.value === "") { mostrarError(selectLibro, "Selecciona un libro."); valido = false; } else limpiarError(selectLibro);
+        if (!inputFecha.value) {
+          mostrarError(inputFecha, "Ingresa la fecha de vencimiento.");
+          valido = false;
+        } else if (new Date(inputFecha.value) < new Date(new Date().toDateString())) {
+          mostrarError(inputFecha, "La fecha no puede ser anterior a hoy.");
+          valido = false;
+        } else {
+          limpiarError(inputFecha);
+        }
+
+        if (!valido) {
+          errorDiv.textContent = 'Revisa los campos marcados en rojo.';
+          errorDiv.classList.remove('d-none');
+          return;
+        }
+
+        const usuarioElegido = usuarios[Number(selectUsuario.value)];
+        const libroElegido = libros[Number(selectLibro.value)];
+
+        prestamos.push({
+          usuario: usuarioElegido.nombreCompleto,
+          libro: libroElegido.titulo,
+          estado: "Activo",
+          fechaVencimiento: inputFecha.value,
+        });
+        guardarLista(CLAVE_PRESTAMOS, prestamos);
+        pintarPrestamos();
+        this.reset();
+        document.querySelectorAll('#formPrestamo .is-invalid').forEach(el => el.classList.remove('is-invalid'));
+      });
+    </script>
+  </body>
+</html>

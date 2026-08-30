@@ -22,10 +22,11 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarMain">
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-            <li class="nav-item"><a class="nav-link" href="#catalogo">Catálogo</a></li>
-            <li class="nav-item"><a class="nav-link" href="#usuarios">Usuarios</a></li>
-            <li class="nav-item"><a class="nav-link" href="#prestamos">Préstamos</a></li>
-            <li class="nav-item"><a class="nav-link" href="#reservas">Reservas</a></li>
+            <li class="nav-item"><a class="nav-link active" href="biblioteca.html">Inicio</a></li>
+            <li class="nav-item"><a class="nav-link" href="catalogo.html">Catálogo</a></li>
+            <li class="nav-item"><a class="nav-link" href="usuarios.html">Usuarios</a></li>
+            <li class="nav-item"><a class="nav-link" href="prestamos.html">Préstamos</a></li>
+            <li class="nav-item"><a class="nav-link" href="reservas.html">Reservas</a></li>
             <li class="nav-item"><a class="nav-link" href="contacto.html">Contacto</a></li>
             <li class="nav-item" id="navIngreso"><a class="nav-link" href="ingreso.html">Iniciar sesión</a></li>
             <li class="nav-item" id="navCrearCuenta"><a class="nav-link" href="crear-cuenta.html">Crear cuenta</a></li>
@@ -36,7 +37,10 @@
 
     <header class="container site-title">
       <div class="menu-terms">
-        <span>Catálogo</span> | <span>Usuarios</span> | <span>Préstamos</span> | <span>Reservas</span>
+        <a href="catalogo.html" class="text-decoration-none" style="color:inherit;">Catálogo</a> |
+        <a href="usuarios.html" class="text-decoration-none" style="color:inherit;">Usuarios</a> |
+        <a href="prestamos.html" class="text-decoration-none" style="color:inherit;">Préstamos</a> |
+        <a href="reservas.html" class="text-decoration-none" style="color:inherit;">Reservas</a>
       </div>
     </header>
 
@@ -81,46 +85,6 @@
         </div>
       </section>
 
-      <section class="py-4" id="usuarios">
-        <h2 class="text-center mb-4">Nuestros usuarios registrados</h2>
-        <div class="card feature-card">
-          <div class="card-body">
-            <ul class="lista-datos" id="usuarios-lista"></ul>
-          </div>
-        </div>
-      </section>
-
-      <section class="py-4" id="catalogo">
-        <div class="row align-items-center g-4 mb-3">
-          <div class="col-lg-5">
-            <img src="https://images.pexels.com/photos/590493/pexels-photo-590493.jpeg" alt="Estantes de libros" class="img-fluid rounded shadow" />
-          </div>
-          <div class="col-lg-7">
-            <h2>Catálogo destacado</h2>
-            <p>Explora algunos de los libros disponibles en este momento en nuestra biblioteca.</p>
-          </div>
-        </div>
-        <div class="row g-3" id="catalogo-lista"></div>
-      </section>
-
-      <section class="py-4" id="prestamos">
-        <h2 class="text-center mb-4">Préstamos activos</h2>
-        <div class="card feature-card">
-          <div class="card-body">
-            <ul class="lista-datos" id="prestamos-lista"></ul>
-          </div>
-        </div>
-      </section>
-
-      <section class="py-4" id="reservas">
-        <h2 class="text-center mb-4">Reservas pendientes</h2>
-        <div class="card feature-card">
-          <div class="card-body">
-            <ul class="lista-datos" id="reservas-lista"></ul>
-          </div>
-        </div>
-      </section>
-
       <section class="row g-4 py-4">
         <div class="col-md-6">
           <div class="card feature-card h-100">
@@ -149,6 +113,29 @@
         </div>
       </section>
 
+      <section class="py-4" id="actividades">
+        <h2 class="text-center mb-4">Actividades culturales</h2>
+        <article class="card feature-card">
+          <div class="card-body">
+            <h5 class="card-title">Conoce cómo funciona una biblioteca por dentro</h5>
+            <p>
+              Además del préstamo de libros, nuestra biblioteca organiza charlas, talleres de
+              lectura y visitas guiadas durante todo el año. Si nunca has visitado una biblioteca
+              pública grande, te dejamos este video de la Biblioteca Nacional de Chile para que
+              conozcas cómo funcionan estos espacios y los servicios que ofrecen a la comunidad.
+            </p>
+            <div class="ratio ratio-16x9">
+              <iframe
+                src="https://www.youtube.com/embed/QRQiEj4CuxY"
+                title="Visita a la Biblioteca Nacional de Chile"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+              </iframe>
+            </div>
+          </div>
+        </article>
+      </section>
+
     </main>
 
     <footer>
@@ -158,97 +145,10 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="datos.js"></script>
     <script>
-      /* =====================================================================
-         Esta versión es 100% frontend: NO llama a ms-usuarios, ms-libros,
-         ms-prestamos ni ms-reservas (puertos 8091-8094). En su lugar:
-         - "Usuarios registrados" se lee desde localStorage (lo que se
-           registró en crear-cuenta.html).
-         - "Catálogo", "Préstamos" y "Reservas" muestran datos de EJEMPLO
-           (arreglos fijos aquí abajo), porque sin los microservicios
-           corriendo no hay datos reales que traer.
-         Cuando vuelvas a conectar los microservicios, solo hay que
-         reemplazar estos 4 bloques por los fetch() que ya tenías.
-         ===================================================================== */
-
-      // ---- 1. Usuarios registrados (desde localStorage) ----
-      const CLAVE_USUARIOS = "biblioteca_usuarios";
-      function obtenerUsuarios() {
-        const data = localStorage.getItem(CLAVE_USUARIOS);
-        return data ? JSON.parse(data) : [];
-      }
-
-      const listaUsuarios = document.getElementById('usuarios-lista');
-      const usuarios = obtenerUsuarios();
-      if (usuarios.length === 0) {
-        listaUsuarios.innerHTML = '<li class="vacio">Aún no hay usuarios registrados. ¡Crea una cuenta para aparecer aquí!</li>';
-      } else {
-        usuarios.forEach(u => {
-          const li = document.createElement('li');
-          li.textContent = `${u.nombreCompleto} - ${u.tipoUsuario}`;
-          listaUsuarios.appendChild(li);
-        });
-      }
-
-      // ---- 2. Catálogo destacado (datos de ejemplo) ----
-      const librosDemo = [
-        { titulo: "Cien años de soledad", autor: "Gabriel García Márquez", categoria: "Novela", anio: 1967 },
-        { titulo: "1984", autor: "George Orwell", categoria: "Ciencia ficción", anio: 1949 },
-        { titulo: "El principito", autor: "Antoine de Saint-Exupéry", categoria: "Infantil", anio: 1943 },
-      ];
-      const contCatalogo = document.getElementById('catalogo-lista');
-      librosDemo.forEach(l => {
-        const col = document.createElement('div');
-        col.className = 'col-md-4';
-        col.innerHTML = `
-          <div class="card feature-card h-100">
-            <div class="card-body">
-              <h5 class="card-title">${l.titulo}</h5>
-              <p class="card-text">${l.autor}<br>${l.categoria}, ${l.anio}</p>
-            </div>
-          </div>`;
-        contCatalogo.appendChild(col);
-      });
-
-      // ---- 3. Préstamos activos (datos de ejemplo) ----
-      const prestamosDemo = [
-        { idPrestamo: 101, estado: "Activo", fechaVencimiento: "2026-09-15" },
-        { idPrestamo: 102, estado: "Atrasado", fechaVencimiento: "2026-08-20" },
-      ];
-      const listaPrestamos = document.getElementById('prestamos-lista');
-      prestamosDemo.forEach(p => {
-        const li = document.createElement('li');
-        li.textContent = `Préstamo #${p.idPrestamo} - Estado: ${p.estado} - Vence: ${p.fechaVencimiento}`;
-        listaPrestamos.appendChild(li);
-      });
-
-      // ---- 4. Reservas pendientes (datos de ejemplo) ----
-      const reservasDemo = [
-        { idReserva: 201, estado: "Pendiente", fechaVigencia: "2026-09-30" },
-      ];
-      const listaReservas = document.getElementById('reservas-lista');
-      reservasDemo.forEach(r => {
-        const li = document.createElement('li');
-        li.textContent = `Reserva #${r.idReserva} - Estado: ${r.estado} - Vigente hasta: ${r.fechaVigencia}`;
-        listaReservas.appendChild(li);
-      });
-
-      // ---- 5. Barra de sesión: muestra si hay un usuario logueado ----
-      const sesion = JSON.parse(sessionStorage.getItem('biblioteca_sesion') || 'null');
-      if (sesion) {
-        const barra = document.getElementById('barraSesion');
-        barra.classList.remove('d-none');
-        barra.innerHTML = `Sesión iniciada como <strong>${sesion.nombreCompleto}</strong> (${sesion.tipoUsuario}) · <a href="#" id="cerrarSesion">Cerrar sesión</a>`;
-
-        document.getElementById('navIngreso').classList.add('d-none');
-        document.getElementById('navCrearCuenta').classList.add('d-none');
-
-        document.getElementById('cerrarSesion').addEventListener('click', function (e) {
-          e.preventDefault();
-          sessionStorage.removeItem('biblioteca_sesion');
-          window.location.reload();
-        });
-      }
+      sembrarDatosDemo();
+      pintarBarraSesion();
     </script>
   </body>
 </html>
