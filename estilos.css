@@ -1,3 +1,4 @@
+
 /* =====================================================================
    ESTILOS.CSS — Biblioteca Municipal
    Identidad visual: ficha de catálogo / sello de préstamo.
@@ -153,6 +154,37 @@ footer {
 .btn-primario:hover { background-color: var(--bronce-oscuro); color: var(--tinta-navy); }
 
 .form-label { font-weight: 500; color: var(--tinta-navy); }
+
+/* ---- Tarjetas de catálogo tipo "producto": imagen + título + categoría/año ---- */
+.placeholder-imagen {
+  height: 130px;
+  background: var(--papel);
+  border: 1px dashed var(--borde-papel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--texto-suave);
+  font-size: 0.8rem;
+  border-radius: 3px;
+  margin-bottom: 0.65rem;
+}
+.catalogo-titulo-link {
+  display: block;
+  text-align: center;
+  color: var(--bronce);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  margin-bottom: 0.5rem;
+}
+.catalogo-titulo-link:hover { color: var(--bronce-oscuro); text-decoration: underline; }
+.catalogo-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+}
+.catalogo-meta .catalogo-anio { color: var(--tinta-navy); font-weight: 600; }
 
 /* Foco de los campos: bronce en vez del azul genérico de Bootstrap */
 .form-control:focus,

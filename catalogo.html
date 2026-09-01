@@ -34,12 +34,6 @@
       </div>
     </nav>
 
-    <header class="container site-title">
-      <div class="menu-terms">
-        <span>Catálogo</span> | <span>Usuarios</span> | <span>Préstamos</span> | <span>Reservas</span>
-      </div>
-    </header>
-
     <main class="container py-4">
       <section class="py-4">
         <div class="row align-items-center g-4 mb-3">
@@ -53,37 +47,46 @@
         </div>
         <div class="row g-3" id="catalogo-lista"></div>
 
-        <div class="card feature-card mt-4">
-          <div class="card-body">
-            <h5 class="card-title">Agregar libro al catálogo</h5>
-            <form id="formLibro" class="row g-3" novalidate>
-              <div class="col-md-4">
-                <label for="libroTitulo" class="form-label">Título</label>
-                <input type="text" class="form-control" id="libroTitulo" maxlength="100" required />
-                <div class="mensaje-error"></div>
-              </div>
-              <div class="col-md-3">
-                <label for="libroAutor" class="form-label">Autor</label>
-                <input type="text" class="form-control" id="libroAutor" maxlength="80" required />
-                <div class="mensaje-error"></div>
-              </div>
-              <div class="col-md-3">
-                <label for="libroCategoria" class="form-label">Categoría</label>
-                <input type="text" class="form-control" id="libroCategoria" maxlength="50" required />
-                <div class="mensaje-error"></div>
-              </div>
-              <div class="col-md-2">
-                <label for="libroAnio" class="form-label">Año</label>
-                <input type="number" class="form-control" id="libroAnio" min="1400" max="2026" required />
-                <div class="mensaje-error"></div>
-              </div>
-              <div id="mensajeErrorLibro" class="alert alert-danger d-none" role="alert"></div>
-              <div class="col-12">
-                <button type="submit" class="btn btn-primario">Agregar libro</button>
-              </div>
-            </form>
+        <!-- Este bloque solo se muestra si el usuario inició sesión como Administrador -->
+        <div id="zonaAdminCatalogo" class="d-none">
+          <div class="card feature-card mt-4">
+            <div class="card-body">
+              <h5 class="card-title">Agregar libro al catálogo</h5>
+              <p class="text-muted small">Sección visible solo para administradores (bibliotecarios).</p>
+              <form id="formLibro" class="row g-3" novalidate>
+                <div class="col-md-4">
+                  <label for="libroTitulo" class="form-label">Título</label>
+                  <input type="text" class="form-control" id="libroTitulo" maxlength="100" required />
+                  <div class="mensaje-error"></div>
+                </div>
+                <div class="col-md-3">
+                  <label for="libroAutor" class="form-label">Autor</label>
+                  <input type="text" class="form-control" id="libroAutor" maxlength="80" required />
+                  <div class="mensaje-error"></div>
+                </div>
+                <div class="col-md-3">
+                  <label for="libroCategoria" class="form-label">Categoría</label>
+                  <input type="text" class="form-control" id="libroCategoria" maxlength="50" required />
+                  <div class="mensaje-error"></div>
+                </div>
+                <div class="col-md-2">
+                  <label for="libroAnio" class="form-label">Año</label>
+                  <input type="number" class="form-control" id="libroAnio" min="1400" max="2026" required />
+                  <div class="mensaje-error"></div>
+                </div>
+                <div id="mensajeErrorLibro" class="alert alert-danger d-none" role="alert"></div>
+                <div class="col-12">
+                  <button type="submit" class="btn btn-primario">Agregar libro</button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
+
+        <!-- Este mensaje se muestra a usuarios normales / visitantes sin sesión de administrador -->
+        <p id="avisoNoAdmin" class="text-muted text-center mt-4">
+          ¿Eres bibliotecario? <a href="ingreso.html" style="color:var(--bronce);">Inicia sesión como administrador</a> para agregar libros al catálogo.
+        </p>
       </section>
     </main>
 
@@ -99,6 +102,16 @@
       sembrarDatosDemo();
       pintarBarraSesion();
 
+      // Solo un usuario logueado como Administrador puede ver el formulario
+      // para agregar libros al catálogo.
+      const sesionActual = JSON.parse(sessionStorage.getItem('biblioteca_sesion') || 'null');
+      const esAdministrador = sesionActual && sesionActual.tipoUsuario === 'ADMINISTRADOR';
+
+      if (esAdministrador) {
+        document.getElementById('zonaAdminCatalogo').classList.remove('d-none');
+        document.getElementById('avisoNoAdmin').classList.add('d-none');
+      }
+
       let libros = obtenerLista(CLAVE_LIBROS) || [];
 
       function pintarCatalogo() {
@@ -110,13 +123,16 @@
         }
         libros.forEach(l => {
           const col = document.createElement('div');
-          col.className = 'col-md-4';
+          col.className = 'col-6 col-md-3';
           col.innerHTML = `
-            <div class="card feature-card h-100">
-              <div class="card-body">
-                <h5 class="card-title">${l.titulo}</h5>
-                <p class="card-text">${l.autor}<br>${l.categoria}, ${l.anio}</p>
+            <div class="card feature-card h-100 p-2">
+              <div class="placeholder-imagen">Imagen</div>
+              <a href="#" class="catalogo-titulo-link" onclick="return false;">${l.titulo}</a>
+              <div class="catalogo-meta">
+                <span>${l.categoria}</span>
+                <span class="catalogo-anio">${l.anio}</span>
               </div>
+              <p class="text-muted mt-1 mb-0" style="font-size:0.75rem;">${l.autor}</p>
             </div>`;
           contCatalogo.appendChild(col);
         });
