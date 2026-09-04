@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Catálogo | Biblioteca Municipal</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="estilos.css" />
   </head>
   <body>
@@ -26,6 +27,11 @@
             <li class="nav-item"><a class="nav-link" href="usuarios.html">Usuarios</a></li>
             <li class="nav-item"><a class="nav-link" href="prestamos.html">Préstamos</a></li>
             <li class="nav-item"><a class="nav-link" href="reservas.html">Reservas</a></li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#cartModal">
+                <i class="bi bi-basket3"></i> Carrito (<span id="contadorCarrito">0</span>)
+              </a>
+            </li>
             <li class="nav-item"><a class="nav-link" href="contacto.html">Contacto</a></li>
             <li class="nav-item" id="navIngreso"><a class="nav-link" href="ingreso.html">Iniciar sesión</a></li>
             <li class="nav-item" id="navCrearCuenta"><a class="nav-link" href="crear-cuenta.html">Crear cuenta</a></li>
@@ -42,12 +48,14 @@
           </div>
           <div class="col-lg-7">
             <h2>Catálogo destacado</h2>
-            <p>Explora algunos de los libros disponibles en este momento en nuestra biblioteca.</p>
+            <p>Explora algunos de los libros disponibles en este momento en nuestra biblioteca. Agrega los que quieras pedir prestados al carrito.</p>
           </div>
+        </div>
+        <div id="avisoInicioSesionCatalogo" class="alert alert-warning d-none">
+          ¿Quieres pedir un libro prestado? <a href="ingreso.html">Inicia sesión</a> para agregarlo a tu carrito.
         </div>
         <div class="row g-3" id="catalogo-lista"></div>
 
-        <!-- Este bloque solo se muestra si el usuario inició sesión como Administrador -->
         <div id="zonaAdminCatalogo" class="d-none">
           <div class="card feature-card mt-4">
             <div class="card-body">
@@ -83,10 +91,6 @@
           </div>
         </div>
 
-        <!-- Este mensaje se muestra a usuarios normales / visitantes sin sesión de administrador -->
-        <p id="avisoNoAdmin" class="text-muted text-center mt-4">
-          ¿Eres bibliotecario? <a href="ingreso.html" style="color:var(--bronce);">Inicia sesión como administrador</a> para agregar libros al catálogo.
-        </p>
       </section>
     </main>
 
@@ -96,20 +100,54 @@
       </div>
     </footer>
 
+    <!-- ===== MODAL DEL CARRITO DE PRÉSTAMOS ===== -->
+    <div class="modal fade" id="cartModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Carrito de préstamos</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+
+            <div id="avisoSinSesionCarrito" class="alert alert-warning d-none">
+              Debes <a href="ingreso.html">iniciar sesión</a> para usar el carrito.
+            </div>
+
+            <div id="cartItems"></div>
+
+            <div id="zonaConfirmarCarrito" class="d-none mt-3">
+              <label for="carritoFecha" class="form-label">Fecha de vencimiento (para todos)</label>
+              <input type="date" class="form-control" id="carritoFecha" />
+              <div class="mensaje-error"></div>
+              <div id="mensajeErrorCarrito" class="alert alert-danger d-none mt-2" role="alert"></div>
+              <div id="mensajeExitoCarrito" class="alert alert-success d-none mt-2" role="alert"></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-primario" id="confirmarPrestamoBtn">Confirmar préstamo</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="datos.js"></script>
     <script>
       sembrarDatosDemo();
       pintarBarraSesion();
+      pintarContadorCarrito();
 
-      // Solo un usuario logueado como Administrador puede ver el formulario
-      // para agregar libros al catálogo.
       const sesionActual = JSON.parse(sessionStorage.getItem('biblioteca_sesion') || 'null');
       const esAdministrador = sesionActual && sesionActual.tipoUsuario === 'ADMINISTRADOR';
 
       if (esAdministrador) {
         document.getElementById('zonaAdminCatalogo').classList.remove('d-none');
-        document.getElementById('avisoNoAdmin').classList.add('d-none');
+      }
+
+      if (!sesionActual) {
+        document.getElementById('avisoInicioSesionCatalogo').classList.remove('d-none');
       }
 
       let libros = obtenerLista(CLAVE_LIBROS) || [];
@@ -121,9 +159,14 @@
           contCatalogo.innerHTML = '<p class="vacio">Aún no hay libros en el catálogo.</p>';
           return;
         }
-        libros.forEach(l => {
+        libros.forEach((l, idx) => {
           const col = document.createElement('div');
           col.className = 'col-6 col-md-3';
+
+          const botonCarrito = sesionActual
+            ? `<button type="button" class="btn btn-primario btn-sm w-100 mt-2" onclick="agregarAlCarritoYActualizar(${idx})">Agregar al carrito</button>`
+            : '';
+
           col.innerHTML = `
             <div class="card feature-card h-100 p-2">
               <div class="placeholder-imagen">Imagen</div>
@@ -133,11 +176,17 @@
                 <span class="catalogo-anio">${l.anio}</span>
               </div>
               <p class="text-muted mt-1 mb-0" style="font-size:0.75rem;">${l.autor}</p>
+              ${botonCarrito}
             </div>`;
           contCatalogo.appendChild(col);
         });
       }
       pintarCatalogo();
+
+      function agregarAlCarritoYActualizar(idx) {
+        agregarAlCarrito(idx);
+        pintarModalCarrito();
+      }
 
       document.getElementById('formLibro').addEventListener('submit', function (e) {
         e.preventDefault();
@@ -171,6 +220,106 @@
         pintarCatalogo();
         this.reset();
         document.querySelectorAll('#formLibro .is-invalid').forEach(el => el.classList.remove('is-invalid'));
+      });
+
+      function pintarModalCarrito() {
+        const carrito = obtenerCarrito();
+        const cartItemsDiv = document.getElementById('cartItems');
+        const avisoSinSesion = document.getElementById('avisoSinSesionCarrito');
+        const zonaConfirmar = document.getElementById('zonaConfirmarCarrito');
+
+        if (!sesionActual) {
+          avisoSinSesion.classList.remove('d-none');
+          cartItemsDiv.innerHTML = '';
+          zonaConfirmar.classList.add('d-none');
+          return;
+        }
+        avisoSinSesion.classList.add('d-none');
+
+        if (carrito.length === 0) {
+          cartItemsDiv.innerHTML = '<p class="text-muted">Tu carrito está vacío. Agrega libros desde el catálogo.</p>';
+          zonaConfirmar.classList.add('d-none');
+          return;
+        }
+
+        zonaConfirmar.classList.remove('d-none');
+        cartItemsDiv.innerHTML = carrito.map(idx => {
+          const libro = libros[idx];
+          if (!libro) return '';
+          return `
+            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+              <div>
+                <strong>${libro.titulo}</strong>
+                <div class="text-muted small">${libro.autor}</div>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline-danger" onclick="quitarDelCarritoYActualizar(${idx})">Quitar</button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function quitarDelCarritoYActualizar(idx) {
+        quitarDelCarrito(idx);
+        pintarModalCarrito();
+      }
+
+      document.getElementById('cartModal').addEventListener('show.bs.modal', pintarModalCarrito);
+
+      document.getElementById('confirmarPrestamoBtn').addEventListener('click', function () {
+        if (!sesionActual) return;
+
+        const carrito = obtenerCarrito();
+        const inputFecha = document.getElementById('carritoFecha');
+        const errorDiv = document.getElementById('mensajeErrorCarrito');
+        const exitoDiv = document.getElementById('mensajeExitoCarrito');
+        errorDiv.classList.add('d-none');
+        exitoDiv.classList.add('d-none');
+
+        if (carrito.length === 0) {
+          errorDiv.textContent = 'Tu carrito está vacío, no hay nada que confirmar.';
+          errorDiv.classList.remove('d-none');
+          return;
+        }
+
+        if (!inputFecha.value) {
+          mostrarError(inputFecha, "Ingresa una fecha de vencimiento.");
+          errorDiv.textContent = 'Revisa la fecha marcada en rojo.';
+          errorDiv.classList.remove('d-none');
+          return;
+        }
+        if (new Date(inputFecha.value) < new Date(new Date().toDateString())) {
+          mostrarError(inputFecha, "La fecha no puede ser anterior a hoy.");
+          errorDiv.textContent = 'Revisa la fecha marcada en rojo.';
+          errorDiv.classList.remove('d-none');
+          return;
+        }
+        limpiarError(inputFecha);
+
+        const prestamos = obtenerLista(CLAVE_PRESTAMOS) || [];
+        carrito.forEach(idx => {
+          const libro = libros[idx];
+          if (!libro) return;
+          prestamos.push({
+            usuario: sesionActual.nombreCompleto,
+            libro: libro.titulo,
+            estado: "Activo",
+            fechaVencimiento: inputFecha.value,
+          });
+        });
+        guardarLista(CLAVE_PRESTAMOS, prestamos);
+        guardarCarrito([]);
+        pintarContadorCarrito();
+        pintarModalCarrito();
+
+        exitoDiv.textContent = '¡Préstamo confirmado! Redirigiendo a Préstamos...';
+        exitoDiv.classList.remove('d-none');
+
+        setTimeout(function () {
+          const modalEl = document.getElementById('cartModal');
+          const modalInstance = bootstrap.Modal.getInstance(modalEl);
+          if (modalInstance) modalInstance.hide();
+          window.location.href = 'prestamos.html';
+        }, 1500);
       });
     </script>
   </body>

@@ -11,6 +11,7 @@ const CLAVE_USUARIOS = "biblioteca_usuarios";
 const CLAVE_LIBROS = "biblioteca_libros";
 const CLAVE_PRESTAMOS = "biblioteca_prestamos";
 const CLAVE_RESERVAS = "biblioteca_reservas";
+const CLAVE_CARRITO = "biblioteca_carrito";
 
 function obtenerLista(clave) {
   const data = localStorage.getItem(clave);
@@ -42,9 +43,18 @@ function limpiarError(input) {
 function sembrarDatosDemo() {
   if (obtenerLista(CLAVE_LIBROS) === null) {
     guardarLista(CLAVE_LIBROS, [
+      { titulo: "El Principito", autor: "Antoine de Saint-Exupéry", categoria: "Infantil", anio: 1943 },
+      { titulo: "Don Quijote de la Mancha", autor: "Miguel de Cervantes", categoria: "Clásico", anio: 1605 },
+      { titulo: "Drácula", autor: "Bram Stoker", categoria: "Terror", anio: 1897 },
+      { titulo: "Frankenstein", autor: "Mary Shelley", categoria: "Terror", anio: 1818 },
       { titulo: "Cien años de soledad", autor: "Gabriel García Márquez", categoria: "Novela", anio: 1967 },
+      { titulo: "El Gran Gatsby", autor: "F. Scott Fitzgerald", categoria: "Clásico", anio: 1925 },
+      { titulo: "El Hobbit", autor: "J.R.R. Tolkien", categoria: "Fantasía", anio: 1937 },
+      { titulo: "Alicia en el País de las Maravillas", autor: "Lewis Carroll", categoria: "Fantasía", anio: 1865 },
       { titulo: "1984", autor: "George Orwell", categoria: "Ciencia ficción", anio: 1949 },
-      { titulo: "El principito", autor: "Antoine de Saint-Exupéry", categoria: "Infantil", anio: 1943 },
+      { titulo: "Hamlet", autor: "William Shakespeare", categoria: "Teatro", anio: 1600 },
+      { titulo: "Romeo y Julieta", autor: "William Shakespeare", categoria: "Teatro", anio: 1597 },
+      { titulo: "La Divina Comedia", autor: "Dante Alighieri", categoria: "Clásico", anio: 1472 },
     ]);
   }
   if (obtenerLista(CLAVE_PRESTAMOS) === null) {
@@ -86,5 +96,47 @@ function pintarBarraSesion() {
       sessionStorage.removeItem('biblioteca_sesion');
       window.location.reload();
     });
+  }
+}
+
+/* =====================================================================
+   CARRITO DE PRÉSTAMOS
+   El carrito guarda ÍNDICES de libros (posición en el arreglo de
+   biblioteca_libros), no los libros completos, para no duplicar datos.
+   ===================================================================== */
+
+function obtenerCarrito() {
+  const data = localStorage.getItem(CLAVE_CARRITO);
+  return data ? JSON.parse(data) : [];
+}
+
+function guardarCarrito(carrito) {
+  localStorage.setItem(CLAVE_CARRITO, JSON.stringify(carrito));
+}
+
+function agregarAlCarrito(indiceLibro) {
+  const carrito = obtenerCarrito();
+  if (!carrito.includes(indiceLibro)) {
+    carrito.push(indiceLibro);
+    guardarCarrito(carrito);
+  }
+  pintarContadorCarrito();
+}
+
+function quitarDelCarrito(indiceLibro) {
+  let carrito = obtenerCarrito();
+  carrito = carrito.filter((idx) => idx !== indiceLibro);
+  guardarCarrito(carrito);
+  pintarContadorCarrito();
+}
+
+/**
+ * Actualiza el número que aparece junto a "Carrito" en el navbar.
+ * Se llama en cada página, igual que pintarBarraSesion().
+ */
+function pintarContadorCarrito() {
+  const contador = document.getElementById('contadorCarrito');
+  if (contador) {
+    contador.textContent = obtenerCarrito().length;
   }
 }
