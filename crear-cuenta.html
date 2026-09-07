@@ -148,17 +148,26 @@
       }
 
       function validarCorreo(valor) {
-        valor = valor.trim();
-        if (valor.length === 0) return { valido: false, mensaje: "El correo no puede estar vacío." };
-        if (valor.length > 60) return { valido: false, mensaje: "Máximo 60 caracteres." };
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor)) {
-          return { valido: false, mensaje: "El formato del correo no es válido." };
-        }
-        if (correoExiste(valor)) {
-          return { valido: false, mensaje: "Ese correo ya está registrado." };
-        }
-        return { valido: true, mensaje: "" };
-      }
+  valor = valor.trim();
+  if (valor.length === 0) return { valido: false, mensaje: "El correo no puede estar vacío." };
+  if (valor.length > 60) return { valido: false, mensaje: "Máximo 60 caracteres." };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor)) {
+    return { valido: false, mensaje: "El formato del correo no es válido." };
+  }
+
+  const dominiosPermitidos = ["@duoc.cl", "@profesor.duoc.cl"];
+  const dominioValido = dominiosPermitidos.some((dominio) =>
+    valor.toLowerCase().endsWith(dominio)
+  );
+  if (!dominioValido) {
+    return { valido: false, mensaje: "Solo se aceptan correos @duoc.cl o @profesor.duoc.cl." };
+  }
+
+  if (correoExiste(valor)) {
+    return { valido: false, mensaje: "Ese correo ya está registrado." };
+  }
+  return { valido: true, mensaje: "" };
+}
 
       function validarFechaNacimiento(valor) {
         if (!valor) return { valido: false, mensaje: "Debes ingresar tu fecha de nacimiento." };
