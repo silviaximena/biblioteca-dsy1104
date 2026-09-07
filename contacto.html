@@ -55,6 +55,7 @@
             <div class="mb-3">
               <label for="email" class="form-label">Correo electrónico</label>
               <input type="email" class="form-control" id="email" placeholder="nombre@correo.com" required />
+              <div class="form-text">Solo @duoc.cl, @duocuc.cl, @profesor.duoc.cl o @gmail.com.</div>
               <div class="mensaje-error"></div>
             </div>
             <div class="mb-3">
@@ -131,9 +132,14 @@
           limpiarError(inputNombre);
         }
 
-        const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputCorreo.value.trim());
+        const correoTrim = inputCorreo.value.trim();
+        const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correoTrim);
+        const dominioValido = /@(duoc\.cl|duocuc\.cl|profesor\.duoc\.cl|gmail\.com)$/i.test(correoTrim);
         if (!correoValido) {
           mostrarError(inputCorreo, "Ingresa un correo válido.");
+          valido = false;
+        } else if (!dominioValido) {
+          mostrarError(inputCorreo, "Solo se aceptan correos @duoc.cl, @duocuc.cl, @profesor.duoc.cl o @gmail.com.");
           valido = false;
         } else {
           limpiarError(inputCorreo);

@@ -38,6 +38,7 @@
         <div class="mb-3">
           <label for="email" class="form-label">Correo electrónico</label>
           <input type="email" class="form-control" id="email" placeholder="nombre@correo.com" required />
+          <div class="form-text">Solo @duoc.cl, @duocuc.cl, @profesor.duoc.cl o @gmail.com.</div>
           <div class="mensaje-error"></div>
         </div>
 
@@ -109,6 +110,26 @@
 
         const correo = inputCorreo.value.trim();
         const password = inputPassword.value;
+
+        // Formato y dominio del correo (según pauta: @duoc.cl, @profesor.duoc.cl, @gmail.com)
+        if (!correo) {
+          mostrarError(inputCorreo, "El correo es obligatorio.");
+          errorDiv.textContent = 'Revisa el campo marcado en rojo.';
+          errorDiv.classList.remove('d-none');
+          return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+          mostrarError(inputCorreo, "Ingresa un correo con formato válido.");
+          errorDiv.textContent = 'Revisa el campo marcado en rojo.';
+          errorDiv.classList.remove('d-none');
+          return;
+        }
+        if (!/@(duoc\.cl|duocuc\.cl|profesor\.duoc\.cl|gmail\.com)$/i.test(correo)) {
+          mostrarError(inputCorreo, "Solo se aceptan correos @duoc.cl, @duocuc.cl, @profesor.duoc.cl o @gmail.com.");
+          errorDiv.textContent = 'Revisa el campo marcado en rojo.';
+          errorDiv.classList.remove('d-none');
+          return;
+        }
 
         const usuario = buscarUsuarioPorCorreo(correo);
 

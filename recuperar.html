@@ -43,6 +43,7 @@
           <div class="mb-3">
             <label for="correoRecuperar" class="form-label">Correo</label>
             <input type="email" class="form-control" id="correoRecuperar" required />
+            <div class="form-text">Solo @duoc.cl, @duocuc.cl, @profesor.duoc.cl o @gmail.com.</div>
             <div class="mensaje-error"></div>
           </div>
           <button type="submit" class="btn btn-primario w-100">Buscar cuenta</button>
@@ -134,6 +135,18 @@
         limpiarError(inputCorreo);
 
         const correo = inputCorreo.value.trim();
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+          mostrarError(inputCorreo, "Ingresa un correo con formato válido.");
+          mostrarMensaje("Revisa el correo ingresado.", "danger");
+          return;
+        }
+        if (!/@(duoc\.cl|duocuc\.cl|profesor\.duoc\.cl|gmail\.com)$/i.test(correo)) {
+          mostrarError(inputCorreo, "Solo se aceptan correos @duoc.cl, @duocuc.cl, @profesor.duoc.cl o @gmail.com.");
+          mostrarMensaje("Revisa el correo ingresado.", "danger");
+          return;
+        }
+
         const usuario = buscarUsuarioPorCorreo(correo);
 
         if (!usuario) {
