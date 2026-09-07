@@ -89,30 +89,6 @@ function pintarBarraSesion() {
   if (navIngreso) navIngreso.classList.add('d-none');
   if (navCrearCuenta) navCrearCuenta.classList.add('d-none');
 
-  const btnCerrar = document.getElementById('cerrarSesion');
-  if (btnCerrar) {
-    btnCerrar.addEventListener('click', function (e) {
-      e.preventDefault();
-      sessionStorage.removeItem('biblioteca_sesion');
-      window.location.reload();
-    });
-  }
-  function pintarBarraSesion() {
-  const sesion = JSON.parse(sessionStorage.getItem('biblioteca_sesion') || 'null');
-  if (!sesion) return;
-
-  const barra = document.getElementById('barraSesion');
-  if (barra) {
-    barra.classList.remove('d-none');
-    barra.innerHTML = `Sesión iniciada como <strong>${sesion.nombreCompleto}</strong> (${sesion.tipoUsuario}) · <a href="#" id="cerrarSesion">Cerrar sesión</a>`;
-  }
-
-  const navIngreso = document.getElementById('navIngreso');
-  const navCrearCuenta = document.getElementById('navCrearCuenta');
-  if (navIngreso) navIngreso.classList.add('d-none');
-  if (navCrearCuenta) navCrearCuenta.classList.add('d-none');
-
-  // ===== NUEVO: mostrar el link "Admin" solo si el tipo de usuario es ADMINISTRADOR =====
   const navAdmin = document.getElementById('navAdmin');
   if (navAdmin && sesion.tipoUsuario === 'ADMINISTRADOR') {
     navAdmin.classList.remove('d-none');
@@ -127,8 +103,6 @@ function pintarBarraSesion() {
     });
   }
 }
-}
-
 /* =====================================================================
    CARRITO DE PRÉSTAMOS
    El carrito guarda ÍNDICES de libros (posición en el arreglo de
