@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Administración | Biblioteca Municipal</title>
+
+    <!-- El mismo estilos.css que usan todas las páginas del sitio -->
+    <link rel="stylesheet" href="estilos.css">
+
+    <!-- =====================================================
+         ESTILOS EXCLUSIVOS DEL ADMIN
+         Reutiliza las variables definidas en estilos.css
+         (--tinta-navy, --azul-rey, --bronce, --papel, etc.)
+    ====================================================== -->
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--papel-claro);
+            color: var(--texto-tinta);
+        }
+
+
+        /* =====================================================
+           CABECERA ADMIN
+        ====================================================== */
+
+        .admin-header {
+            height: 72px;
+            background: var(--azul-rey);
+            border-bottom: 3px solid var(--bronce);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 35px;
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            font-family: "Lora", Georgia, serif;
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--papel-claro);
+        }
+
+        .admin-logo-badge {
+            width: 38px;
+            height: 38px;
+            border-radius: 3px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: var(--bronce);
+            color: var(--tinta-navy);
+
+            font-family: "Lora", Georgia, serif;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .admin-cabecera-derecha {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .admin-user {
+            font-size: 13px;
+            color: var(--papel-claro);
+        }
+
+        .admin-volver {
+            color: var(--papel-claro) !important;
+            font-size: 13px;
+            text-decoration: underline;
+        }
+        .admin-volver:hover {
+            color: var(--bronce) !important;
+        }
+
+        .btn-salir {
+            border: none;
+            background: var(--bronce);
+            color: var(--tinta-navy);
+
+            padding: 9px 18px;
+            border-radius: 3px;
+
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: "Work Sans", sans-serif;
+        }
+
+        .btn-salir:hover {
+            background: var(--bronce-oscuro);
+        }
+
+
+        /* =====================================================
+           ESTRUCTURA PRINCIPAL
+        ====================================================== */
+
+        .admin-layout {
+            min-height: calc(100vh - 72px);
+            display: flex;
+        }
+
+
+        /* =====================================================
+           MENÚ LATERAL
+        ====================================================== */
+
+        .admin-sidebar {
+            width: 220px;
+            background: var(--papel);
+            border-right: 1px solid var(--borde-papel);
+            padding: 30px 20px;
+        }
+
+        .admin-sidebar h3 {
+            margin: 0 0 25px;
+
+            font-family: "Work Sans", sans-serif;
+            font-size: 11px;
+            color: var(--texto-suave);
+
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .admin-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .admin-menu button {
+            width: 100%;
+
+            border: none;
+            border-left: 3px solid transparent;
+            background: transparent;
+
+            padding: 13px 15px;
+
+            text-align: left;
+            cursor: pointer;
+
+            font-family: "Work Sans", sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--texto-tinta);
+        }
+
+        .admin-menu button:hover,
+        .admin-menu button.activo {
+            background: var(--papel-claro);
+            border-left: 3px solid var(--bronce);
+            color: var(--azul-rey);
+            font-weight: 600;
+        }
+
+
+        /* =====================================================
+           CONTENIDO
+        ====================================================== */
+
+        .admin-content {
+            flex: 1;
+            padding: 35px;
+            overflow-x: auto;
+        }
+
+        .admin-seccion {
+            display: none;
+        }
+
+        .admin-seccion.activa {
+            display: block;
+        }
+
+        .admin-titulo {
+            margin-bottom: 30px;
+        }
+
+        .admin-titulo h1 {
+            margin: 0 0 7px;
+            font-size: 28px;
+        }
+
+        .admin-titulo p {
+            margin: 0;
+            color: var(--texto-suave);
+            font-size: 13px;
+        }
+
+
+        /* =====================================================
+           TARJETAS DEL DASHBOARD
+        ====================================================== */
+
+        .estadisticas {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .estadistica {
+            background: var(--papel-claro);
+            border: 1px solid var(--borde-papel);
+            border-left: 4px solid var(--bronce);
+            border-radius: 4px;
+            padding: 25px;
+        }
+
+        .estadistica span {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--texto-suave);
+            font-size: 12px;
+        }
+
+        .estadistica strong {
+            font-family: "Lora", Georgia, serif;
+            font-size: 30px;
+            color: var(--azul-rey);
+        }
+
+
+        /* =====================================================
+           CABECERA DE TABLAS
+        ====================================================== */
+
+        .tabla-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .tabla-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .btn-principal {
+            border: none;
+            background: var(--bronce);
+            color: var(--tinta-navy);
+
+            padding: 11px 18px;
+            border-radius: 3px;
+
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: "Work Sans", sans-serif;
+            letter-spacing: 0.03em;
+        }
+
+        .btn-principal:hover {
+            background: var(--bronce-oscuro);
+        }
+
+
+        /* =====================================================
+           TABLAS
+        ====================================================== */
+
+        .tabla-contenedor {
+            background: var(--papel-claro);
+            border: 1px solid var(--borde-papel);
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            font-family: "Work Sans", sans-serif;
+        }
+
+        th {
+            background: var(--papel);
+            padding: 13px 12px;
+            text-align: left;
+            font-weight: bold;
+            color: var(--tinta-navy);
+            border-bottom: 1px solid var(--borde-papel);
+        }
+
+        td {
+            padding: 13px 12px;
+            border-bottom: 1px dashed var(--borde-papel);
+            color: var(--texto-tinta);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .acciones-tabla {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-tabla {
+            border: 1px solid var(--borde-papel);
+            background: var(--papel-claro);
+            border-radius: 3px;
+
+            padding: 6px 9px;
+
+            cursor: pointer;
+            font-size: 11px;
+            font-family: "Work Sans", sans-serif;
+            color: var(--texto-tinta);
+        }
+
+        .btn-tabla:hover {
+            background: var(--papel);
+        }
+
+        .btn-eliminar {
+            color: var(--sello-rojo);
+            border-color: var(--sello-rojo);
+        }
+
+
+        /* =====================================================
+           FORMULARIOS
+        ====================================================== */
+
+        .formulario {
+            max-width: 800px;
+            background: var(--papel-claro);
+            border: 1px solid var(--borde-papel);
+            border-radius: 4px;
+            padding: 30px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .campo-admin {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .campo-admin.completo {
+            grid-column: 1 / -1;
+        }
+
+        .campo-admin label {
+            margin-bottom: 7px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--tinta-navy);
+        }
+
+        .campo-admin input,
+        .campo-admin select,
+        .campo-admin textarea {
+            width: 100%;
+            border: 1px solid var(--borde-papel);
+            border-radius: 3px;
+            padding: 11px;
+            background: #FFFFFF;
+            font-family: "Work Sans", sans-serif;
+            font-size: 12px;
+            color: var(--texto-tinta);
+        }
+
+        .campo-admin input:focus,
+        .campo-admin select:focus,
+        .campo-admin textarea:focus {
+            outline: none;
+            border-color: var(--bronce);
+            box-shadow: 0 0 0 0.2rem rgba(184, 134, 11, 0.25);
+        }
+
+        .campo-error {
+            margin-top: 5px;
+            color: var(--sello-rojo);
+            font-size: 11px;
+            display: none;
+        }
+
+        .campo-error.visible {
+            display: block;
+        }
+
+        .form-botones {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn-secundario {
+            border: 1px solid var(--azul-rey);
+            background: #FFFFFF;
+            color: var(--azul-rey);
+
+            padding: 11px 20px;
+            border-radius: 3px;
+
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: "Work Sans", sans-serif;
+        }
+
+        .btn-secundario:hover {
+            background: var(--papel);
+        }
+
+
+        /* =====================================================
+           MODAL DETALLE
+        ====================================================== */
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(31, 42, 60, .55);
+
+            display: none;
+            align-items: center;
+            justify-content: center;
+
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal.visible {
+            display: flex;
+        }
+
+        .modal-contenido {
+            width: 100%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+
+            background: var(--papel-claro);
+            border-top: 4px solid var(--bronce);
+            border-radius: 4px;
+            padding: 30px;
+        }
+
+        .modal-cabecera {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .modal-cabecera h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .modal-cerrar {
+            border: none;
+            background: transparent;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--tinta-navy);
+        }
+
+        .detalle {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 12px;
+            font-size: 13px;
+            font-family: "Work Sans", sans-serif;
+        }
+
+        .detalle strong {
+            color: var(--azul-rey);
+        }
+
+
+        /* =====================================================
+           MENSAJE VACÍO
+        ====================================================== */
+
+        .sin-datos {
+            text-align: center;
+            padding: 40px;
+            color: var(--texto-suave);
+            font-family: "Work Sans", sans-serif;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ====================================================== */
+
+        @media (max-width: 800px) {
+
+            .admin-header {
+                padding: 0 15px;
+                flex-wrap: wrap;
+                height: auto;
+                gap: 10px;
+                padding-top: 10px;
+                padding-bottom: 10px;
+            }
+
+            .admin-layout {
+                flex-direction: column;
+            }
+
+            .admin-sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--borde-papel);
+                padding: 15px;
+            }
+
+            .admin-menu {
+                flex-direction: row;
+                overflow-x: auto;
+            }
+
+            .admin-menu button {
+                width: auto;
+                white-space: nowrap;
+                border-left: none;
+                border-bottom: 3px solid transparent;
+            }
+
+            .admin-menu button.activo {
+                border-left: none;
+                border-bottom: 3px solid var(--bronce);
+            }
+
+            .admin-content {
+                padding: 20px;
+            }
+
+            .estadisticas {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .campo-admin.completo {
+                grid-column: auto;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+    <!-- =====================================================
+         CABECERA
+    ====================================================== -->
+
+    <header class="admin-header">
+
+        <div class="admin-logo">
+            <span class="admin-logo-badge">BM</span>
+            <span>Biblioteca Municipal — Administración</span>
+        </div>
+
+        <div class="admin-cabecera-derecha">
+            <a class="admin-volver" href="biblioteca.html">Volver al sitio</a>
+            <span class="admin-user" id="admin-nombre-sesion"></span>
+            <button class="btn-salir" onclick="cerrarSesionAdmin()">Cerrar sesión</button>
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         ESTRUCTURA ADMIN
+    ====================================================== -->
+
+    <div class="admin-layout">
+
+        <!-- =================================================
+             MENÚ
+        ================================================== -->
+
+        <aside class="admin-sidebar">
+
+            <h3>Panel administrativo</h3>
+
+            <nav class="admin-menu">
+                <button class="activo" onclick="mostrarSeccion('inicio', this)">Inicio</button>
+                <button onclick="mostrarSeccion('catalogo', this)">Catálogo</button>
+                <button onclick="mostrarSeccion('usuarios', this)">Usuarios</button>
+                <button onclick="mostrarSeccion('prestamos', this)">Préstamos</button>
+            </nav>
+
+        </aside>
+
+
+        <!-- =================================================
+             CONTENIDO
+        ================================================== -->
+
+        <main class="admin-content">
+
+
+            <!-- =================================================
+                 INICIO
+            ================================================== -->
+
+            <section id="seccion-inicio" class="admin-seccion activa">
+
+                <div class="admin-titulo">
+                    <h1>Panel administrativo</h1>
+                    <p>Gestiona el catálogo de libros, y revisa los usuarios y préstamos de la Biblioteca Municipal.</p>
+                </div>
+
+                <div class="estadisticas">
+
+                    <div class="estadistica">
+                        <span>Libros en el catálogo</span>
+                        <strong id="total-libros">0</strong>
+                    </div>
+
+                    <div class="estadistica">
+                        <span>Usuarios registrados</span>
+                        <strong id="total-usuarios">0</strong>
+                    </div>
+
+                    <div class="estadistica">
+                        <span>Préstamos registrados</span>
+                        <strong id="total-prestamos">0</strong>
+                    </div>
+
+                </div>
+
+                <div class="tabla-contenedor">
+                    <div style="padding:25px">
+                        <strong>Administración de la Biblioteca Municipal</strong>
+                        <p style="color:var(--texto-suave);font-size:13px;margin-top:6px">
+                            Usa el menú de la izquierda para agregar o eliminar libros del catálogo,
+                            y para revisar los usuarios y préstamos registrados en el sistema.
+                        </p>
+                    </div>
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 CATÁLOGO (LIBROS)
+            ================================================== -->
+
+            <section id="seccion-catalogo" class="admin-seccion">
+
+                <div class="admin-titulo">
+                    <h1>Catálogo</h1>
+                    <p>Agrega o elimina libros del catálogo de la biblioteca.</p>
+                </div>
+
+                <div class="tabla-header">
+                    <h2>Listado de libros</h2>
+                    <button class="btn-principal" onclick="mostrarFormularioLibro()">+ Agregar libro</button>
+                </div>
+
+                <div class="tabla-contenedor">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Título</th>
+                                <th>Autor</th>
+                                <th>Categoría</th>
+                                <th>Año</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-libros"></tbody>
+                    </table>
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 FORMULARIO LIBRO
+            ================================================== -->
+
+            <section id="seccion-libro-form" class="admin-seccion">
+
+                <div class="admin-titulo">
+                    <h1 id="titulo-form-libro">Agregar libro</h1>
+                    <p>Completa los datos del libro.</p>
+                </div>
+
+                <form class="formulario" id="form-libro" novalidate>
+
+                    <input type="hidden" id="libro-id">
+
+                    <div class="form-grid">
+
+                        <div class="campo-admin">
+                            <label for="libro-titulo">Título *</label>
+                            <input type="text" id="libro-titulo" maxlength="100" required>
+                            <span class="campo-error" id="error-libro-titulo">Ingresa el título del libro (máximo 100 caracteres).</span>
+                        </div>
+
+                        <div class="campo-admin">
+                            <label for="libro-autor">Autor *</label>
+                            <input type="text" id="libro-autor" maxlength="80" required>
+                            <span class="campo-error" id="error-libro-autor">Ingresa el nombre del autor (máximo 80 caracteres).</span>
+                        </div>
+
+                        <div class="campo-admin">
+                            <label for="libro-categoria">Categoría *</label>
+                            <input type="text" id="libro-categoria" maxlength="50" required>
+                            <span class="campo-error" id="error-libro-categoria">La categoría no puede estar vacía.</span>
+                        </div>
+
+                        <div class="campo-admin">
+                            <label for="libro-anio">Año de publicación *</label>
+                            <input type="number" id="libro-anio" min="1400" max="2026" step="1" required>
+                            <span class="campo-error" id="error-libro-anio">Ingresa un año válido (entre 1400 y 2026).</span>
+                        </div>
+
+                    </div>
+
+                    <div class="form-botones">
+                        <button type="button" class="btn-secundario" onclick="mostrarSeccionPorId('catalogo')">Cancelar</button>
+                        <button type="submit" class="btn-principal">Guardar libro</button>
+                    </div>
+
+                </form>
+
+            </section>
+
+
+            <!-- =================================================
+                 USUARIOS (SOLO LECTURA)
+            ================================================== -->
+
+            <section id="seccion-usuarios" class="admin-seccion">
+
+                <div class="admin-titulo">
+                    <h1>Usuarios</h1>
+                    <p>Usuarios registrados en el sistema (solo lectura).</p>
+                </div>
+
+                <div class="tabla-header">
+                    <h2>Listado de usuarios</h2>
+                </div>
+
+                <div class="tabla-contenedor">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Correo</th>
+                                <th>Tipo de usuario</th>
+                                <th>Teléfono</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-usuarios"></tbody>
+                    </table>
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 PRÉSTAMOS (SOLO LECTURA)
+            ================================================== -->
+
+            <section id="seccion-prestamos" class="admin-seccion">
+
+                <div class="admin-titulo">
+                    <h1>Préstamos</h1>
+                    <p>Préstamos registrados por los usuarios (solo lectura).</p>
+                </div>
+
+                <div class="tabla-header">
+                    <h2>Listado de préstamos</h2>
+                </div>
+
+                <div class="tabla-contenedor">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Libro</th>
+                                <th>Estado</th>
+                                <th>Fecha de vencimiento</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-prestamos"></tbody>
+                    </table>
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <!-- =====================================================
+         MODAL DETALLE
+    ====================================================== -->
+
+    <div class="modal" id="modal-detalle">
+        <div class="modal-contenido">
+            <div class="modal-cabecera">
+                <h2 id="modal-titulo">Detalle</h2>
+                <button class="modal-cerrar" onclick="cerrarModal()">×</button>
+            </div>
+            <div class="detalle" id="modal-detalle-contenido"></div>
+        </div>
+    </div>
+
+
+    <!-- =====================================================
+         JAVASCRIPT ADMIN
+         Usa exactamente las mismas funciones/claves que ya usan
+         catalogo.html y prestamos.html (definidas en datos.js):
+           CLAVE_LIBROS, CLAVE_USUARIOS, CLAVE_PRESTAMOS,
+           obtenerLista(), guardarLista()
+         y el mismo formato de sesión que guarda ingreso.html:
+           sessionStorage.biblioteca_sesion = { nombreCompleto, correo, tipoUsuario }
+    ====================================================== -->
+
+    <script src="datos.js"></script>
+    <script>
+
+        const ETIQUETAS_TIPO_USUARIO = {
+            ESTUDIANTE: "Estudiante",
+            PROFESOR: "Profesor",
+            PERSONAL: "Personal / Vecino",
+            ADMINISTRADOR: "Administrador (bibliotecario)"
+        };
+
+        sembrarDatosDemo();
+
+        /* =====================================================
+           CONTROL DE ACCESO — solo Administrador
+           (misma condición que ya usa catalogo.html)
+        ====================================================== */
+
+        const sesionActual = JSON.parse(sessionStorage.getItem("biblioteca_sesion") || "null");
+        const esAdministrador = sesionActual && sesionActual.tipoUsuario === "ADMINISTRADOR";
+
+        if (!esAdministrador) {
+            window.location.href = "ingreso.html";
+        }
+
+        const nombreEl = document.getElementById("admin-nombre-sesion");
+        if (nombreEl && sesionActual) {
+            nombreEl.textContent = sesionActual.nombreCompleto;
+        }
+
+
+        /* =====================================================
+           DATOS (mismas claves y funciones que el resto del sitio)
+        ====================================================== */
+
+        let libros = obtenerLista(CLAVE_LIBROS) || [];
+        let usuarios = obtenerLista(CLAVE_USUARIOS) || [];
+        let prestamos = obtenerLista(CLAVE_PRESTAMOS) || [];
+
+
+        /* =====================================================
+           INICIO
+        ====================================================== */
+
+        document.addEventListener("DOMContentLoaded", function () {
+            cargarTablas();
+            cargarEstadisticas();
+        });
+
+
+        /* =====================================================
+           NAVEGACIÓN
+        ====================================================== */
+
+        function mostrarSeccion(nombre, boton) {
+
+            document.querySelectorAll(".admin-seccion").forEach(function (seccion) {
+                seccion.classList.remove("activa");
+            });
+
+            const seccion = document.getElementById("seccion-" + nombre);
+            if (seccion) seccion.classList.add("activa");
+
+            document.querySelectorAll(".admin-menu button").forEach(function (btn) {
+                btn.classList.remove("activo");
+            });
+
+            if (boton) boton.classList.add("activo");
+        }
+
+        function mostrarSeccionPorId(nombre) {
+
+            const botones = document.querySelectorAll(".admin-menu button");
+            let botonEncontrado = null;
+
+            botones.forEach(function (boton) {
+                if (boton.getAttribute("onclick") && boton.getAttribute("onclick").includes("'" + nombre + "'")) {
+                    botonEncontrado = boton;
+                }
+            });
+
+            mostrarSeccion(nombre, botonEncontrado);
+        }
+
+
+        /* =====================================================
+           ESTADÍSTICAS
+        ====================================================== */
+
+        function cargarEstadisticas() {
+            document.getElementById("total-libros").textContent = libros.length;
+            document.getElementById("total-usuarios").textContent = usuarios.length;
+            document.getElementById("total-prestamos").textContent = prestamos.length;
+        }
+
+        function cargarTablas() {
+            cargarLibros();
+            cargarUsuarios();
+            cargarPrestamos();
+            cargarEstadisticas();
+        }
+
+
+        /* =====================================================
+           LIBROS — TABLA
+        ====================================================== */
+
+        function cargarLibros() {
+
+            const tabla = document.getElementById("tabla-libros");
+            tabla.innerHTML = "";
+
+            if (libros.length === 0) {
+                tabla.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="sin-datos">No hay libros registrados en el catálogo.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            libros.forEach(function (libro, indice) {
+
+                const fila = document.createElement("tr");
+
+                fila.innerHTML = `
+                    <td>${libro.titulo}</td>
+                    <td>${libro.autor}</td>
+                    <td>${libro.categoria}</td>
+                    <td>${libro.anio}</td>
+                    <td>
+                        <div class="acciones-tabla">
+                            <button class="btn-tabla" onclick="verLibro(${indice})">Ver</button>
+                            <button class="btn-tabla" onclick="editarLibro(${indice})">Editar</button>
+                            <button class="btn-tabla btn-eliminar" onclick="eliminarLibro(${indice})">Eliminar</button>
+                        </div>
+                    </td>
+                `;
+
+                tabla.appendChild(fila);
+            });
+        }
+
+
+        /* =====================================================
+           LIBROS — FORMULARIO (agregar / editar)
+           Se trabaja por índice dentro del arreglo, igual que
+           catalogo.html (los libros no tienen "id" propio).
+        ====================================================== */
+
+        function mostrarFormularioLibro() {
+
+            document.getElementById("form-libro").reset();
+            document.getElementById("libro-id").value = "";
+            document.getElementById("titulo-form-libro").textContent = "Agregar libro";
+
+            document.querySelectorAll("#form-libro .campo-error").forEach(function (e) {
+                e.classList.remove("visible");
+            });
+
+            mostrarSeccionPorId("libro-form");
+        }
+
+        document.getElementById("form-libro").addEventListener("submit", function (evento) {
+
+            evento.preventDefault();
+
+            const indice = document.getElementById("libro-id").value;
+            const titulo = document.getElementById("libro-titulo").value.trim();
+            const autor = document.getElementById("libro-autor").value.trim();
+            const categoria = document.getElementById("libro-categoria").value.trim();
+            const anio = Number(document.getElementById("libro-anio").value);
+
+            let valido = true;
+
+            document.querySelectorAll("#form-libro .campo-error").forEach(function (e) {
+                e.classList.remove("visible");
+            });
+
+            if (titulo.length === 0 || titulo.length > 100) {
+                document.getElementById("error-libro-titulo").classList.add("visible");
+                valido = false;
+            }
+
+            if (autor.length === 0 || autor.length > 80) {
+                document.getElementById("error-libro-autor").classList.add("visible");
+                valido = false;
+            }
+
+            if (categoria.length === 0 || categoria.length > 50) {
+                document.getElementById("error-libro-categoria").classList.add("visible");
+                valido = false;
+            }
+
+            if (!anio || anio < 1400 || anio > 2026) {
+                document.getElementById("error-libro-anio").classList.add("visible");
+                valido = false;
+            }
+
+            if (!valido) return;
+
+            const libro = { titulo, autor, categoria, anio };
+
+            if (indice !== "") {
+                libros[Number(indice)] = libro;
+            } else {
+                libros.push(libro);
+            }
+
+            guardarLista(CLAVE_LIBROS, libros);
+
+            cargarTablas();
+            mostrarSeccionPorId("catalogo");
+        });
+
+        function editarLibro(indice) {
+
+            const libro = libros[indice];
+            if (!libro) return;
+
+            document.getElementById("libro-id").value = indice;
+            document.getElementById("libro-titulo").value = libro.titulo;
+            document.getElementById("libro-autor").value = libro.autor;
+            document.getElementById("libro-categoria").value = libro.categoria;
+            document.getElementById("libro-anio").value = libro.anio;
+            document.getElementById("titulo-form-libro").textContent = "Editar libro";
+
+            mostrarSeccionPorId("libro-form");
+        }
+
+        function eliminarLibro(indice) {
+
+            const libro = libros[indice];
+            if (!libro) return;
+
+            const confirmar = confirm(`¿Seguro que deseas eliminar "${libro.titulo}" del catálogo?`);
+            if (!confirmar) return;
+
+            libros.splice(indice, 1);
+            guardarLista(CLAVE_LIBROS, libros);
+
+            cargarTablas();
+        }
+
+        function verLibro(indice) {
+
+            const libro = libros[indice];
+            if (!libro) return;
+
+            abrirModal("Detalle del libro", `
+                <strong>Título</strong><span>${libro.titulo}</span>
+                <strong>Autor</strong><span>${libro.autor}</span>
+                <strong>Categoría</strong><span>${libro.categoria}</span>
+                <strong>Año</strong><span>${libro.anio}</span>
+            `);
+        }
+
+
+        /* =====================================================
+           USUARIOS — TABLA (solo lectura)
+        ====================================================== */
+
+        function cargarUsuarios() {
+
+            const tabla = document.getElementById("tabla-usuarios");
+            tabla.innerHTML = "";
+
+            if (usuarios.length === 0) {
+                tabla.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="sin-datos">No hay usuarios registrados.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            usuarios.forEach(function (usuario, indice) {
+
+                const fila = document.createElement("tr");
+                const tipoTexto = ETIQUETAS_TIPO_USUARIO[usuario.tipoUsuario] || usuario.tipoUsuario || "";
+
+                fila.innerHTML = `
+                    <td>${usuario.nombreCompleto}</td>
+                    <td>${usuario.correo}</td>
+                    <td>${tipoTexto}</td>
+                    <td>${usuario.telefono || "—"}</td>
+                    <td>
+                        <div class="acciones-tabla">
+                            <button class="btn-tabla" onclick="verUsuario(${indice})">Ver</button>
+                        </div>
+                    </td>
+                `;
+
+                tabla.appendChild(fila);
+            });
+        }
+
+        function verUsuario(indice) {
+
+            const usuario = usuarios[indice];
+            if (!usuario) return;
+
+            const tipoTexto = ETIQUETAS_TIPO_USUARIO[usuario.tipoUsuario] || usuario.tipoUsuario || "";
+
+            abrirModal("Detalle del usuario", `
+                <strong>Nombre</strong><span>${usuario.nombreCompleto}</span>
+                <strong>Correo</strong><span>${usuario.correo}</span>
+                <strong>Fecha nacimiento</strong><span>${usuario.fechaNacimiento || "No registrada"}</span>
+                <strong>Teléfono</strong><span>${usuario.telefono || "No registrado"}</span>
+                <strong>Tipo de usuario</strong><span>${tipoTexto}</span>
+            `);
+        }
+
+
+        /* =====================================================
+           PRÉSTAMOS — TABLA (solo lectura)
+        ====================================================== */
+
+        function cargarPrestamos() {
+
+            const tabla = document.getElementById("tabla-prestamos");
+            tabla.innerHTML = "";
+
+            if (prestamos.length === 0) {
+                tabla.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="sin-datos">No hay préstamos registrados.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            prestamos.forEach(function (prestamo, indice) {
+
+                const fila = document.createElement("tr");
+
+                fila.innerHTML = `
+                    <td>${prestamo.usuario}</td>
+                    <td>${prestamo.libro}</td>
+                    <td>${prestamo.estado || "Activo"}</td>
+                    <td>${prestamo.fechaVencimiento}</td>
+                    <td>
+                        <div class="acciones-tabla">
+                            <button class="btn-tabla" onclick="verPrestamo(${indice})">Ver</button>
+                        </div>
+                    </td>
+                `;
+
+                tabla.appendChild(fila);
+            });
+        }
+
+        function verPrestamo(indice) {
+
+            const prestamo = prestamos[indice];
+            if (!prestamo) return;
+
+            abrirModal("Detalle del préstamo", `
+                <strong>Usuario</strong><span>${prestamo.usuario}</span>
+                <strong>Libro</strong><span>${prestamo.libro}</span>
+                <strong>Estado</strong><span>${prestamo.estado || "Activo"}</span>
+                <strong>Fecha vencimiento</strong><span>${prestamo.fechaVencimiento}</span>
+            `);
+        }
+
+
+        /* =====================================================
+           MODAL
+        ====================================================== */
+
+        function abrirModal(titulo, contenido) {
+            document.getElementById("modal-titulo").textContent = titulo;
+            document.getElementById("modal-detalle-contenido").innerHTML = contenido;
+            document.getElementById("modal-detalle").classList.add("visible");
+        }
+
+        function cerrarModal() {
+            document.getElementById("modal-detalle").classList.remove("visible");
+        }
+
+        document.getElementById("modal-detalle").addEventListener("click", function (evento) {
+            if (evento.target === this) cerrarModal();
+        });
+
+
+        /* =====================================================
+           CERRAR SESIÓN
+        ====================================================== */
+
+        function cerrarSesionAdmin() {
+            sessionStorage.removeItem("biblioteca_sesion");
+            window.location.href = "ingreso.html";
+        }
+
+    </script>
+
+</body>
+
+</html>
